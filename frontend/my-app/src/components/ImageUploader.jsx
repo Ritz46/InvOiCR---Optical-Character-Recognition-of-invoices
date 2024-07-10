@@ -6,8 +6,64 @@ const ImageUploader = () => {
   const [imageSrc, setImageSrc] = useState(null);
   const [imageTitle, setImageTitle] = useState('');
   const [result, setResult] = useState('');
+  const [formData, setFormData] = useState({
+    subsidiary: '',
+    documentNumber: '',
+    billDate: '',
+    GSTIN: '',
+    invoiceNumber: '',
+    tax_amount:''
+  });
+
+  useEffect(() => {
+    if (result) {
+      console.log(result);
+      findFields(result)
+    }
+  }, [result]);
+
+  useEffect(() => {
+    if (result) {
+      console.log(formData);
+    }
+  }, [formData]);
+
+  const findFields = (text) => {
+    const colonIndex = text.indexOf(':');
+    const subsi = text.substring(0,colonIndex);
+
+    const regex_GST = /GSTIN\s*:\s*([^\s]+)/;
+    const match_GST = text.match(regex_GST);
+
+    const regex_DocumentNo = /Document\s+No\s+([^\s]+)/;
+    const match_Doc = text.match(regex_DocumentNo);
+
+    const regex_billDAte = /Bill\s+Date\s+([^\s]+)/
+    const match_billDate = text.match(regex_billDAte);
+
+    const regex_InvoiceNumber = /Invoice\s+No\s+([^\s]+)/
+    const match_Inv_num = text.match(regex_InvoiceNumber);
 
 
+    const regex = /Rs\.\s*([^ ]+)/g;
+    let match;
+    let prices = [];
+    
+    while ((match = regex.exec(text)) !== null) {
+      prices.push(match[1]);
+    }
+
+    const tax_amt = prices[1]
+
+    setFormData({
+      subsidiary: subsi,
+      GSTIN : match_GST[1],
+      billDate: match_billDate[1],
+      documentNumber: match_Doc[1],
+      invoiceNumber: match_Inv_num[1],
+      tax_amount : tax_amt
+    });
+  }
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -94,6 +150,7 @@ const ImageUploader = () => {
       console.error('Error uploading image:', error);
     } finally {
       setIsLoading(false); 
+      console.log(result);
       
 
     }
@@ -127,12 +184,35 @@ const ImageUploader = () => {
           
         </div>
         <div>
-            <button className="btn" onClick={handleSubmit} >Extract Text</button>
+            <button className="btn" onClick={handleSubmit} >Extract Fields</button>
             {isLoading && (
         <div className="loading-spinner"></div>
       )}
           </div>
-          <div>
+
+          <div className="pre-existing-section1">
+            <h4 style={{marginBottom:'20px', color:'grey'}}>Fields will automatically update here</h4><hr></hr>
+            <form>
+              <div className="form-group">
+              <label htmlFor="Subsidiary" style={{ textAlign: 'left' }}>Subsidiary</label>
+                <input id="Subsidiary" value={formData.subsidiary || ''} onChange={(e) => setFormData({ ...formData, subsidiary: e.target.value })} />
+                <label htmlFor="DocumentNumber" style={{textAlign:'left'}}>Document Number</label>
+                <input id="DocumentNumber" value={formData.documentNumber || ''} onChange={(e)=> setFormData({...formData, documentNumber: e.target.value})}></input>
+                <label htmlFor="BillDate" style={{textAlign:'left'}}>Bill Date</label>
+                <input id="BillDate" value={formData.billDate || ''} onChange={(e)=> setFormData({...formData, billDate:e.target.value})}></input>
+                <label htmlFor="InvoiceNumber" style={{textAlign:'left'}}>Invoice Number</label>
+                <input id="InvoiceNumber" value={formData.invoiceNumber || ''} onChange={(e)=> setFormData({...formData, invoiceNumber:e.target.value})}></input>
+                <label htmlFor="GSTIN" style={{textAlign:'left'}}>GSTIN</label>
+                <input id="GSTIN" value={formData.GSTIN || ''} onChange={(e)=> setFormData({...formData, GSTIN:e.target.value})}></input>
+                <label htmlFor="TaxAmt" style={{textAlign:'left'}}>Tax Amount</label>
+                <input id="TaxAmt" value={formData.tax_amount|| ''} onChange={(e)=> setFormData({...formData, tax_amount:e.target.value})}></input>
+                <button className="file-upload-btn" type="button" style={{marginTop:'30px'}}>
+                    UPLOAD 
+                </button>
+                </div>
+            </form>
+          </div>
+          {/* <div>
             {result && (
               <div>
               <div className="pre-existing-section1">
@@ -143,15 +223,15 @@ const ImageUploader = () => {
               </div>
               
             )}
-          </div>
+          </div> */}
         </div>
 
         <div className="pre-existing-section">
-          <h4>UPLOADED IMAGE</h4><hr></hr>
+          <h4>UPLOADED INVOICE</h4><hr></hr>
           {imageSrc ? (
             <img src={imageSrc} alt="Uploaded" className="img-fluid" />
           ) : (
-            <div><p>Uploaded image will appear here</p>
+            <div><p>Uploaded invoice will appear here</p>
             <BsCardImage style={{ fontSize: '50px', color: 'grey' }} />
             </div>
           )}
