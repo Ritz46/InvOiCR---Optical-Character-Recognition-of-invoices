@@ -19,7 +19,7 @@ This project aims to provide OCR capabilities through a user-friendly web interf
 3. Run the Flask server:
    --> python app.py
 
-The backend server will start running at `http://localhost:5000`.
+The backend server will start running at `http://localhost:7000`.
 
 ### Frontend (React)
 
