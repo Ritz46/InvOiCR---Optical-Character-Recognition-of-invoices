@@ -156,6 +156,42 @@ const ImageUploader = () => {
     }
   };
 
+  const handleUpload = async () => {
+      try {
+        const response = await fetch('http://localhost:7000/uploadFields', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'  // Set the Content-Type header to application/json
+          },
+          body: JSON.stringify(formData),  // Convert formData to JSON string
+        });
+        if (response.ok) {
+          setFormData({
+            subsidiary: '',
+            documentNumber: '',
+            billDate: '',
+            GSTIN: '',
+            invoiceNumber: '',
+            tax_amount:''
+          });
+          
+          alert('Uploaded to database successfully !');
+          
+        } else {
+          console.error('Error uploading form:', response.statusText);
+        }
+      }
+      catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
+
+
+
+
+
+
   return (
     <div style={{ marginTop: '50px' }}>
       <div className="container">
@@ -181,7 +217,8 @@ const ImageUploader = () => {
           
 
           
-          
+
+
         </div>
         <div>
             <button className="btn" onClick={handleSubmit} >Extract Fields</button>
@@ -206,7 +243,7 @@ const ImageUploader = () => {
                 <input id="GSTIN" value={formData.GSTIN || ''} onChange={(e)=> setFormData({...formData, GSTIN:e.target.value})}></input>
                 <label htmlFor="TaxAmt" style={{textAlign:'left'}}>Tax Amount</label>
                 <input id="TaxAmt" value={formData.tax_amount|| ''} onChange={(e)=> setFormData({...formData, tax_amount:e.target.value})}></input>
-                <button className="file-upload-btn" type="button" style={{marginTop:'30px'}}>
+                <button className="file-upload-btn" type="button" style={{marginTop:'30px'}} onClick={handleUpload}>
                     UPLOAD 
                 </button>
                 </div>

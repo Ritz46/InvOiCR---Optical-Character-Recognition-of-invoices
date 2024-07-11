@@ -16,7 +16,7 @@ const ContactUs = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit  = async (e) => {
     e.preventDefault();
     // Handle form submission logic here
     console.log('Form data:', formData);
@@ -27,6 +27,26 @@ const ContactUs = () => {
       email: '',
       message: ''
     });
+
+    try {
+      const response = await fetch('http://localhost:7000/contact-Us', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'  // Set the Content-Type header to application/json
+        },
+        body: JSON.stringify(formData),  // Convert formData to JSON string
+      });
+
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+      } else {
+        console.error('Error uploading form:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error uploading form:', error);
+    } 
   };
 
   return (
@@ -66,7 +86,7 @@ const ContactUs = () => {
             required 
           />
         </div>
-        <button type="submit" className='btn'>Submit</button>
+        <button type="submit" className='btn' onSubmit={handleSubmit}>Submit</button>
       </form>
     </div>
   );
